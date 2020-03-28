@@ -1,0 +1,11 @@
+[Unit]
+Description=BattCaverna I/O service
+After=multi-user.target
+ 
+[Service]
+Type=simple
+ExecStart=/usr/bin/python /srv/homeassistant/homeassistant/scripts/battcaverna_io.py --port 8023 --spibus 0 --spics 0
+Restart=on-abort
+ 
+[Install]
+WantedBy=multi-user.target
