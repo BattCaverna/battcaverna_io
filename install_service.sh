@@ -9,4 +9,6 @@ install () {
 	sudo systemctl start ${service}
 }
 
+sudo cp battcaverna_io.py /usr/local/bin/
+sudo cp sipo.py /usr/local/bin/
 install battcaverna_io

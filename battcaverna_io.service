@@ -4,7 +4,7 @@ After=multi-user.target
  
 [Service]
 Type=simple
-ExecStart=/usr/bin/python /srv/homeassistant/homeassistant/scripts/battcaverna_io.py --port 8023 --spibus 0 --spics 0
+ExecStart=/usr/bin/python /usr/local/bin/battcaverna_io.py --port 8023 --spibus 0 --spics 0
 Restart=on-abort
  
 [Install]
