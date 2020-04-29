@@ -11,4 +11,5 @@ install () {
 
 sudo cp battcaverna_io.py /usr/local/bin/
 sudo cp sipo.py /usr/local/bin/
+sudo cp ina226_driver_aardvark.py /usr/local/bin/
 install battcaverna_io

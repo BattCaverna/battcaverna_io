@@ -6,7 +6,7 @@ from optparse import OptionParser
 import threading
 import struct
 import logging
-from ina226_driver_aardvark import ina226
+import ina226_driver_aardvark as ina226
 
 def readv(res):
     # This is needed because sometimes voltage channels get swapped:
@@ -176,6 +176,33 @@ class CmdTCPHandler(SocketServer.StreamRequestHandler):
         ret = [0]
         ret.append("%.02f" % i)
         return ret
+    
+    def cmd_read_ina(self, args):
+        try:
+            i2cbus = int(args[1])
+            address = int(args[2], 16)
+            shunt = float(args[3])
+            imax =  float(args[4])
+            volt_curr = args[5]
+
+            sensor = ina226.ina226(address, i2cbus)
+            sensor.configure(avg = ina226.ina226_averages_t['INA226_AVERAGES_64'],)
+            sensor.calibrate(rShuntValue = shunt, iMaxExcepted = imax)  
+        except:
+            return [-2]
+
+        ret = [0]
+        val = 0
+        if volt_curr.startswith("curr"):
+            val = sensor.readShuntCurrent()
+        else:
+            val = sensor.readBusVoltage()
+        ret.append("%.02f" % val)
+        return ret
+
+
+        
+
 
     def cmd_quit(self, args):
         self.request.sendall("0 Bye Bye!\n")
