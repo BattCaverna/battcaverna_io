@@ -6,6 +6,7 @@ from optparse import OptionParser
 import threading
 import struct
 import logging
+from ina226_driver_aardvark import ina226
 
 def readv(res):
     # This is needed because sometimes voltage channels get swapped:
