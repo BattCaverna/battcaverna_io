@@ -232,10 +232,10 @@ class ina226:
     
         minimumLSB = float(iMaxExcepted) / 32767
         
-        print "minimumLSB:"+str(minimumLSB)
+        #print "minimumLSB:"+str(minimumLSB)
         
         self.currentLSB = int((minimumLSB * 100000000))
-        print "currentLSB:"+str(self.currentLSB)
+        #print "currentLSB:"+str(self.currentLSB)
         self.currentLSB /= 100000000.0
         self.currentLSB /= 0.0001
         self.currentLSB = math.ceil(self.currentLSB)
@@ -244,8 +244,8 @@ class ina226:
         self.powerLSB = self.currentLSB * 25;
         
         
-        print "powerLSB:"+str(self.powerLSB)
-        print "rshunt:"+str(self.rShunt)
+        #print "powerLSB:"+str(self.powerLSB)
+        #print "rshunt:"+str(self.rShunt)
         
         calibrationValue = int(((0.00512) / (self.currentLSB * self.rShunt))) #if we get error need to convert this to unsigned int 16 bit instead
     
