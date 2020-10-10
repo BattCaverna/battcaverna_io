@@ -1,10 +1,74 @@
-import spidev
 import threading
 import time
+import gpiozero
+
+
+class Spi:
+
+    def __init__(self):
+        self.buses = [{"miso": 9, "mosi": 10, "clk": 11, "cs": [8, 7]}]
+        self.cshigh = True
+        self.max_speed_hz = 500000
+
+    def open(self, bus, cs):
+        bus = self.buses[bus]
+        self.miso = gpiozero.InputDevice(bus['miso'])
+        self.mosi = gpiozero.OutputDevice(bus['mosi'])
+        self.clk = gpiozero.OutputDevice(bus['clk'])
+        self.cs = gpiozero.OutputDevice(bus['cs'][cs])
+
+    def clk_pulse(self):
+        self.clk.on()
+        time.sleep(0.5 / self.max_speed_hz)
+        self.clk.off()
+        time.sleep(0.5 / self.max_speed_hz)
+
+    def send_byte(self, b):
+        input = 0
+        for _ in range(8):
+            input <<= 1
+            if b & (1 << 7):
+                self.mosi.on()
+            else:
+                self.mosi.off()
+
+            if self.miso.is_active:
+                input |= 1
+
+            self.clk_pulse()
+            b <<= 1
+
+        return input
+
+    def set_cs(self, val):
+        if self.cshigh:
+            if val:
+                self.cs.on()
+            else:
+                self.cs.off()
+        else:
+            if val:
+                self.cs.off()
+            else:
+                self.cs.on()
+
+    def xfer(self, data):
+        o = []
+        self.clk.off()
+        self.mosi.off()
+
+        self.set_cs(True)
+        for b in data:
+            o.append(self.send_byte(b))
+        self.set_cs(False)
+
+        return o
+
 
 class Sipo:
+
     def __init__(self, bus=0, cs=0, speed=100000, n_out=16):
-        self.spi = spidev.SpiDev()
+        self.spi = Spi()
         self.spi.open(bus, cs)
         self.spi.max_speed_hz = speed
         self.spi.cshigh = True
@@ -61,4 +125,3 @@ class Sipo:
     def stop(self):
         with self.lock:
             self.stopthread = True
-    
