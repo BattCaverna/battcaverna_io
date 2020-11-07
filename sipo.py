@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import threading
 import time
 import gpiozero
@@ -74,7 +77,8 @@ class Sipo:
         self.spi.cshigh = True
         self.n_out = n_out
         self.out_state = [0x00] * (n_out/8)
-        self.in_state = self.spi.xfer(list(self.out_state))
+        self.in_state0 = self.spi.xfer(list(self.out_state))
+        self.in_state1 = list(self.in_state0)
         self.lock = threading.RLock()
         self.stopthread = False
         self.input_thread = threading.Thread(target=self.input_loop)
@@ -104,12 +108,21 @@ class Sipo:
             read = self.spi.xfer(list(self.out_state))
         return (read[i] & (1 << bit) == 0)
 
-    def getcachedinput(self, inp):
+    def getcachedinput_high(self, inp):
         i = inp / 8
         bit = inp % 8
         with self.lock:
-            read = list(self.in_state)
-            self.in_state[i] |= 1 << bit
+            read = list(self.in_state0)
+            self.in_state0[i] |= 1 << bit
+        return (read[i] & (1 << bit) == 0)
+
+    def getcachedinput_low(self, inp):
+        i = inp / 8
+        bit = inp % 8
+        with self.lock:
+            read = list(self.in_state1)
+            self.in_state1[i] &= ~(1 << bit)
+            print(read, self.in_state1[i])
         return (read[i] & (1 << bit) == 0)
 
     def input_loop(self):
@@ -118,7 +131,8 @@ class Sipo:
             with self.lock:
                 read = self.spi.xfer(list(self.out_state))
                 for i, r in enumerate(read):
-                    self.in_state[i] &= r
+                    self.in_state0[i] &= r
+                    self.in_state1[i] |= r
                 stop = self.stopthread
             time.sleep(0.1)
 
