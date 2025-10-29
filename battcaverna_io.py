@@ -264,8 +264,13 @@ if __name__ == "__main__":
                       help="SPI frequency", type="int", default=100000)
 
     GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(17, GPIO.IN)
-    GPIO.setup([22, 23, 25, 26], GPIO.OUT, initial=GPIO.LOW)
+
+    GPIO.setup(22, GPIO.OUT, initial=GPIO.LOW)
+    GPIO.setup(23, GPIO.OUT, initial=GPIO.LOW)
+    GPIO.setup(24, GPIO.IN)
+    GPIO.setup(25, GPIO.OUT, initial=GPIO.LOW)
+    GPIO.setup(26, GPIO.OUT, initial=GPIO.LOW)
+
     (options, args) = parser.parse_args()
     HOST, PORT = "0.0.0.0", options.port
     # Create the server
