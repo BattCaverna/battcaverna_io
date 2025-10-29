@@ -229,7 +229,8 @@ class CmdTCPHandler(SocketServer.StreamRequestHandler):
             return [-2]
         ret = [0]
 
-        GPIO.setup(pin, GPIO.IN)
+        if GPIO.gpio_function(pin) != GPIO.OUT:
+            GPIO.setup(pin, GPIO.IN)
         val = int(GPIO.input(pin))
         ret.append("%d" % val)
         return ret
@@ -263,6 +264,8 @@ if __name__ == "__main__":
                       help="SPI frequency", type="int", default=100000)
 
     GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(17, GPIO.IN)
+    GPIO.setup([22, 23, 25, 26], GPIO.OUT, initial=GPIO.LOW)
     (options, args) = parser.parse_args()
     HOST, PORT = "0.0.0.0", options.port
     # Create the server
