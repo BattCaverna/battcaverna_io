@@ -10,6 +10,7 @@ import threading
 import struct
 import logging
 import ina226_driver_aardvark as ina226
+import RPi.GPIO as GPIO
 
 
 def readv(res):
@@ -221,6 +222,30 @@ class CmdTCPHandler(SocketServer.StreamRequestHandler):
     def cmd_quit(self, args):
         self.request.sendall("0 Bye Bye!\n")
 
+    def cmd_gpio_read(self, args):
+        try:
+            pin = int(args[1])
+        except:
+            return [-2]
+        ret = [0]
+
+        GPIO.setup(pin, GPIO.IN)
+        val = int(GPIO.input(pin))
+        ret.append("%d" % val)
+        return ret
+
+    def cmd_gpio_write(self, args):
+        try:
+            pin = int(args[1])
+            state = int(args[2])
+        except:
+            return [-2]
+
+        GPIO.setup(pin, GPIO.OUT)
+        GPIO.output(pin, state)
+
+        return [0]
+
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     allow_reuse_address = True
@@ -237,6 +262,7 @@ if __name__ == "__main__":
     parser.add_option("--spispeed", dest="speed",
                       help="SPI frequency", type="int", default=100000)
 
+    GPIO.setmode(GPIO.BOARD)
     (options, args) = parser.parse_args()
     HOST, PORT = "0.0.0.0", options.port
     # Create the server
