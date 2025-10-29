@@ -263,7 +263,7 @@ if __name__ == "__main__":
     parser.add_option("--spispeed", dest="speed",
                       help="SPI frequency", type="int", default=100000)
 
-    GPIO.setmode(GPIO.BOARD)
+    GPIO.setmode(GPIO.BCM)
 
     GPIO.setup(22, GPIO.OUT, initial=GPIO.LOW)
     GPIO.setup(23, GPIO.OUT, initial=GPIO.LOW)
